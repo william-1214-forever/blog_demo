@@ -1,6 +1,9 @@
 const {
 	getList,
-	getDetail
+	getDetail,
+	newBlog,
+	updateBlog,
+	delBlog
 } = require('../controller/blog.js')
 
 const {
@@ -15,39 +18,51 @@ const handleBlogRouter = (req, res) => {
 
 	const path = url.split('?')[0];
 
+	const id = req.query.id
+
 	//获取博客列表
 	if(method === 'GET' && path === '/api/blog/list') {
 		const author = req.query.author ||''
 		const keyword = req.query.keyword || ''
-		const listData = getList(author, keyword)
-		return new SuccussModel(listData)
+		// const listData = getList(author, keyword)
+		// return new SuccussModel(listData)
+		const result = getList(author, keyword);
+		result.then(listData => {
+			return new SuccussModel(listData)
+		})
 	}
 
 	//获取博客详情
 	if (method === 'GET' && path === '/api/blog/detail') {
-		const id = req.query.id
+		
 		const data = getDetail(id)
 		return new SuccussModel(data)
 	}
 
 	//新建一篇博客
 	if(method === 'POST' && path === '/api/blog/new') {
-		return {
-			msg: '这是新建的博客'
-		}
+		const data = newBlog(req.body)
+		return new SuccussModel(data)
 	}
 
 	//更新一篇博客
 	if(method === 'POST' && path === '/api/blog/update') {
-		return {
-			msg: '这是更新的博客'
+		const result = updateBlog(id, req.body)
+		if(result) {
+			return new SuccussModel()
+		} else {
+			return new ErrorModel('更新博客失败')
 		}
 	}
 
 	//删除一篇博客
 	if(method === 'POST' && path === '/api/blog/del') {
-		return {
-			msg: '这是删除的博客'
+		//传入 要删除的id
+		const result = delBlog(id)
+		if(result) {
+			return new SuccussModel()
+		} else {
+			return new ErrorModel('更新博客失败')
 		}
 	}
 
